@@ -20,8 +20,6 @@ struct SettingsView: View {
     @State private var showChangePIN = false
     @State private var showWipe = false
 
-    private let backupType = UTType(exportedAs: "com.mixia.vault.backup")
-
     var body: some View {
         VStack(spacing: 0) {
             navBar
@@ -60,15 +58,15 @@ struct SettingsView: View {
         }
         .fileExporter(isPresented: $showExporter,
                       document: BackupDocument(data: backupData),
-                      contentType: backupType,
-                      defaultFilename: "密匣备份") { result in
+                      contentType: .data,
+                      defaultFilename: "密匣备份.mxvault") { result in
             switch result {
             case .success: store.showToast("备份已导出")
             case .failure: store.showToast("导出取消")
             }
         }
         .fileImporter(isPresented: $showImporter,
-                      allowedContentTypes: [backupType, .data],
+                      allowedContentTypes: [.item],
                       allowsMultipleSelection: false) { result in
             handleImport(result)
         }
@@ -416,9 +414,7 @@ struct SettingsView: View {
 // MARK: - 备份文件
 
 struct BackupDocument: FileDocument {
-    static var readableContentTypes: [UTType] {
-        [UTType(exportedAs: "com.mixia.vault.backup"), .data]
-    }
+    static var readableContentTypes: [UTType] { [.data] }
 
     var data: Data
 
